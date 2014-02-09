@@ -1,0 +1,93 @@
+#!/bin/bash
+
+NL=`echo -e '\n'`
+
+case "$1" in
+
+  "kraken-gnu" )
+    sed \
+      -e 's/@CC@/CC=cc/g' \
+      -e 's/@CXX@/CXX=CC/g' \
+      -e 's/@F90@/F90=ftn/g' \
+      -e 's/@CFLAGS@/CFLAGS+=-O3 -std=c99 -D_XOPEN_SOURCE=600/g' \
+      -e 's/@CXXFLAGS@/CXXFLAGS+=-DLUSTRE_FS -O3 -Wall/g' \
+      -e 's/@FFLAGS@/FFLAGS+=-cpp -O3 -ffree-form -Wall -fmax-errors=1/g' \
+      -e 's/@LIBS@/LIBS=-L\/opt\/xt-lustre-ss\/default\/usr\/lib/ -llustreapi/g' \
+      Makefile.in > Makefile
+    ;;
+
+  "kraken-pgi" )
+    sed \
+      -e 's/@CC@/CC=cc/g' \
+      -e 's/@CXX@/CXX=CC/g' \
+      -e 's/@F90@/F90=ftn/g' \
+      -e 's/@CFLAGS@/CFLAGS+=-O3 -D_XOPEN_SOURCE=600/g' \
+      -e 's/@CXXFLAGS@/CXXFLAGS+=-O3/g' \
+      -e 's/@FFLAGS@/FFLAGS+=-O3/g' \
+      -e 's/@LIBS@/LIBS=/g' \
+      Makefile.in > Makefile
+    ;;
+
+
+  "kraken-lustre" )
+    sed \
+      -e 's/@CC@/CC=cc/g' \
+      -e 's/@CXX@/CXX=CC/g' \
+      -e 's/@F90@/F90=ftn/g' \
+      -e 's/@CFLAGS@/FFLAGS+=-cpp -O3 -ffree-form -Wall -fmax-errors=1/g' \
+      -e 's/@CXXFLAGS@/CXXFLAGS+=-O3 -Wall/g' \
+      -e 's/@FFLAGS@/CFLAGS+=-DLUSTRE_FS -O3 -std=c99 -D_XOPEN_SOURCE=600/g' \
+      -e 's/@LIBS@/LIBS=-L\/opt\/xt-lustre-ss\/2.2.41A_1.6.5\/usr\/lib\/ -llustreapi/g' \
+      Makefile.in > Makefile
+    ;;
+
+  "kraken-debug" )
+    sed \
+      -e 's/@CC@/CC=cc/g' \
+      -e 's/@CXX@/CXX=CC/g' \
+      -e 's/@F90@/F90=ftn/g' \
+      -e 's/@CFLAGS@/CFLAGS+=-g -std=c99 -D_XOPEN_SOURCE=600/g' \
+      -e 's/@CXXFLAGS@/CXXFLAGS+=-g -Wall/g' \
+      -e 's/@FFLAGS@/FFLAGS+=-g -cpp -ffree-form -Wall -fmax-errors=1/g' \
+      -e 's/@LIBS@/LIBS=-lgcc -lc -lgcc/g' \
+      Makefile.in > Makefile
+    ;;
+
+  "linux-mpich" )
+    sed \
+      -e 's/@CC@/CC=mpicc/g' \
+      -e 's/@CXX@/CXX=mpicxx/g' \
+      -e 's/@F90@/F90=mpif90/g' \
+      -e 's/@CFLAGS@/CFLAGS+=-O3 -std=c99 -D_XOPEN_SOURCE=600/g' \
+      -e 's/@CXXFLAGS@/CXXFLAGS+=-O3 -Wall/g' \
+      -e 's/@FFLAGS@/FFLAGS+=-cpp -O3 -ffree-form -Wall -fmax-errors=1/g' \
+      -e 's/@LIBS@/LIBS=/g' \
+      Makefile.in > Makefile
+    ;;
+
+  "linux-mpich-debug" )
+    sed \
+      -e 's/@CC@/CC=mpicc/g' \
+      -e 's/@CXX@/CXX=mpicxx/g' \
+      -e 's/@F90@/F90=mpif90/g' \
+      -e 's/@CFLAGS@/CFLAGS+=-g -std=c99 -D_XOPEN_SOURCE=600/g' \
+      -e 's/@CXXFLAGS@/CXXFLAGS+=-O3 -Wall/g' \
+      -e 's/@FFLAGS@/FFLAGS+=-cpp -g -ffree-form -Wall -fmax-errors=1/g' \
+      -e 's/@LIBS@/LIBS=/g' \
+      Makefile.in > Makefile
+    ;;
+
+  * )
+  echo "Supported configs:"
+  echo "  kraken-gnu"
+  echo "  kraken-pgi"
+  echo "  kraken-lustre"
+  echo "  kraken-debug"
+  echo "  linux-mpich"
+  echo "  linux-mpich-debug"
+  ;;
+
+esac
+
+
+

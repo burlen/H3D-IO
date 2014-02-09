@@ -1,0 +1,72 @@
+
+@CC@
+@CXX@
+@F90@
+@CFLAGS@
+@CXXFLAGS@
+@FFLAGS@
+@LIBS@
+
+MODULES=\
+  FUtil.o \
+  DebugUtil.o \
+  StringModule.o \
+  DoubleVectorModule.o \
+  BoxModule.o \
+  BoxArrayModule.o \
+  CartesianDecompModule.o \
+  MPIFileOffsetModule.o \
+  MPIFileHintModule.o \
+  UnitManagerModule.o \
+  PosixFileModule.o \
+  RunConfigModule.o \
+  LogFileModule.o \
+  MPIFileModule.o \
+  IOBenchmarkCommandLineModule.o
+
+TARGETS=\
+  TestParticleWriter \
+  DumpParticleFile \
+  IOBenchmarkContiguous \
+  IOBenchmarkUniformGrid \
+  DumpSubArrayFile \
+  TestLustreFUtil
+
+.PHONY : all
+all: $(TARGETS)
+
+.PHONY : test
+test: $(TARGETS)
+	mpiexec -np 3 ./TestParticleWriter
+	./DumpParticleFile ./particles.dat
+	mpiexec -np 3 ./H3D-IO-Benchmark
+	./DumpSubArrayFile ./subarray.dat 3
+
+.PHONY : clean
+clean:
+	rm -f $(TARGETS) *.o *.mod *.dat *~ core*
+
+%Module.o : %Module.f90
+	$(F90) $(FFLAGS) -c  $< -o $@
+
+%.o : %.c
+	$(CC) $(CFLAGS) $^ -c -o $@
+
+TestParticleWriter: TestParticleWriter.f90 ParticleWriter.f90 $(MODULES)
+	$(F90) $(FFLAGS) $^ $(LIBS) -o $@
+
+DumpParticleFile: DumpParticleFile.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+IOBenchmarkUniformGrid: IOBenchmarkUniformGrid.f90 $(MODULES)
+	$(F90) $(FFLAGS) $^ -o $@ $(DEBUGFLAGS) $(LIBS)
+
+IOBenchmarkContiguous: IOBenchmarkContiguous.f90 $(MODULES)
+	$(F90) $(FFLAGS) $^ -o $@ $(DEBUGFLAGS) $(LIBS)
+
+DumpSubArrayFile: DumpSubArrayFile.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+TestLustreFUtil: TestLustreFUtil.f90 FUtil.o
+	$(F90) $^ -o $@ $(LIBS)
+

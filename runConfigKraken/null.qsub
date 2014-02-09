@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -A TG-ATM090046
+
+# trivial job that does nothing. Can be used to start a qsub dependency chain. 
+
+cd $PBS_O_WORKDIR
+
+OUT_FILE=/dev/null
+
+aprun -n 1 /bin/date >> $OUT_FILE 
+aprun -n 1 /bin/hostname >> $OUT_FILE
+

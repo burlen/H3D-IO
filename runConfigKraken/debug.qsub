@@ -1,0 +1,48 @@
+#!/bin/bash
+#PBS -A TG-ATM090046
+
+#
+# Batch file for IO benchmark on Kraken.
+# 
+# The script gets it's arguments through the qsub -v environmant variable
+# mechanism. The follwoing variables are required
+# 
+# H3DIO_EXE=/path/to/exec 
+# H3DIO_CONFIG_FILE=/path/to/config/file.conf 
+# H3DIO_LOG_FILE=/path/to/log/file.log 
+# H3DIO_WORK_DIR=/path/to/working/dir
+# CB_ALIGN=-1,0,1,2
+#
+
+H3DIO_EXE=./IOBenchmarkContiguous
+H3DIO_CONFIG_FILE=./test/con-6e9-gate-10-shared-ind.conf
+H3DIO_LOG_FILE=./log/debug-con-6e9-gate-10-shared-ind.log
+H3DIO_WORK_DIR=./data
+
+echo "n=$PBS_NNODES"
+echo "exe=$H3DIO_EXE"
+echo "config=$H3DIO_CONFIG_FILE"
+echo "log= $H3DIO_LOG_FILE"
+echo "workdir=$H3DIO_WORK_DIR"
+
+# verify presence of required variables
+if [[ -z "$H3DIO_EXE"  || -z "$H3DIO_CONFIG_FILE" || -z "$H3DIO_LOG_FILE" || -z "$H3DIO_WORK_DIR"  ]]
+then
+  echo "Error: At least one required environment variable is missing."
+  exit
+fi
+
+if [[ -n  "$MPICH_MPIIO_CB_ALIGN"  ]]
+then
+  export MPICH_MPIIO_CB_ALIGN
+  echo "MPICH_MPIIO_CB_ALIGN=$MPICH_MPIIO_CB_ALIGN"
+fi
+
+cd $PBS_O_WORKDIR
+
+T_H3DIO_WORK_DIR=`mktemp -d $H3DIO_WORK_DIR/XXXXXXXX` || exit
+
+aprun -n $PBS_NNODES $H3DIO_EXE $H3DIO_CONFIG_FILE $H3DIO_LOG_FILE $T_H3DIO_WORK_DIR
+
+rm -rf $T_H3DIO_WORK_DIR
+

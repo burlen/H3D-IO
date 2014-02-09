@@ -1,0 +1,25 @@
+#!/bin/bash
+#PBS -A TG-ATM090046
+
+#
+# Batch file for cleaniung up after IO benchmark on Kraken.
+# 
+# The script gets it's arguments through the qsub -v environmant variable
+# mechanism. The follwoing variables are required
+# 
+# H3DIO_WORK_DIR=/path/to/working/dir
+#
+
+echo "workdir=$H3DIO_WORK_DIR" 
+
+# verify presence of required variables
+if [[ -z "$H3DIO_WORK_DIR" ]]
+then
+  echo "Error: At least one required environment variable is missing."
+  exit
+fi
+
+cd $PBS_O_WORKDIR
+
+rm -rf $H3DIO_WORK_DIR
+
